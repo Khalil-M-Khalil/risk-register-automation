@@ -1,0 +1,29 @@
+Metadata-Version: 2.4
+Name: risk-register-automation
+Version: 1.0.0
+Summary: Automated Risk Register Tool — ISO 27001 Annex A compliant risk scoring, management & professional Excel/PDF reporting
+Author-email: "Khalil M. Khalil" <khalil@example.com>
+License: MIT
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Security
+Classifier: Topic :: Security :: Cryptography
+Classifier: Topic :: Office/Business
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: reportlab>=4.0.0
+Requires-Dist: PyYAML>=6.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
