@@ -65,13 +65,27 @@ class RiskRegister:
         return risk
 
     def update_risk(self, risk_id: str, **kwargs) -> Optional[Risk]:
-        """Update an existing risk."""
+        """Update an existing risk and keep derived metrics consistent."""
         risk = self._risks.get(risk_id)
         if not risk:
             return None
+
+        if "likelihood" in kwargs or "impact" in kwargs:
+            risk.update_scores(
+                likelihood=kwargs.pop("likelihood", None),
+                impact=kwargs.pop("impact", None),
+            )
+
         for key, value in kwargs.items():
-            if hasattr(risk, key):
-                setattr(risk, key, value)
+            if not hasattr(risk, key) or key in {"risk_score", "risk_level", "created_at", "updated_at"}:
+                continue
+            if key == "treatment" and isinstance(value, str):
+                value = RiskTreatment(value)
+            if key == "iso_controls":
+                value = list(dict.fromkeys(value))
+            setattr(risk, key, value)
+
+        risk.updated_at = datetime.now()
         self._save()
         return risk
 

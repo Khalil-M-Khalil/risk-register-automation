@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
+from uuid import uuid4
 
 
 class RiskLevel(Enum):
@@ -66,7 +67,7 @@ class Risk:
         review_date: Scheduled review date
     """
 
-    risk_id: str = field(default_factory=lambda: f"RISK-{datetime.now().strftime('%Y%m%d')}-{hash(datetime.now().timestamp()) % 10000:04d}")
+    risk_id: str = field(default_factory=lambda: f"RISK-{datetime.now().strftime('%Y%m%d')}-{uuid4().hex[:8].upper()}")
     category: str = ""
     title: str = ""
     description: str = ""
@@ -85,7 +86,11 @@ class Risk:
     review_date: Optional[datetime] = None
 
     def __post_init__(self):
-        """Compute risk_score and risk_level after initialization."""
+        """Validate scores and compute derived risk metrics after initialization."""
+        self.likelihood = int(Likelihood(self.likelihood))
+        self.impact = int(Impact(self.impact))
+        if not self.risk_id:
+            self.risk_id = f"RISK-{datetime.now().strftime('%Y%m%d')}-{uuid4().hex[:8].upper()}"
         self.risk_score = self.likelihood * self.impact
         self.risk_level = self._classify_risk()
 
@@ -103,9 +108,9 @@ class Risk:
     def update_scores(self, likelihood: Optional[int] = None, impact: Optional[int] = None):
         """Update likelihood/impact and recompute risk metrics."""
         if likelihood is not None:
-            self.likelihood = Likelihood(likelihood)
+            self.likelihood = int(Likelihood(likelihood))
         if impact is not None:
-            self.impact = Impact(impact)
+            self.impact = int(Impact(impact))
         self.updated_at = datetime.now()
         self.risk_score = self.likelihood * self.impact
         self.risk_level = self._classify_risk()

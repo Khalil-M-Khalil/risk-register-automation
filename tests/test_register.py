@@ -116,3 +116,23 @@ class TestOverdue:
         overdue = reg.get_overdue_risks()
         assert len(overdue) == 1
         assert overdue[0].title == "Old"
+
+
+class TestUpdateConsistency:
+    def test_update_scores_recomputes_level(self, tmp_path):
+        reg = RiskRegister(data_path=tmp_path / "test.json")
+        risk = reg.add_risk("Technical", "Dynamic", "", "A", "O", 1, 1)
+        updated = reg.update_risk(risk.risk_id, likelihood=5, impact=4)
+        assert updated.risk_score == 20
+        assert updated.risk_level == RiskLevel.CRITICAL
+
+    def test_update_accepts_treatment_value(self, tmp_path):
+        reg = RiskRegister(data_path=tmp_path / "test.json")
+        risk = reg.add_risk("Legal", "Treatment", "", "A", "O")
+        updated = reg.update_risk(risk.risk_id, treatment="Accept")
+        assert updated.treatment == RiskTreatment.ACCEPT
+
+    def test_invalid_score_is_rejected(self):
+        with pytest.raises(ValueError):
+            from risk_register.core.risk_model import Risk
+            Risk(category="Technical", title="Invalid", likelihood=6, impact=3)
